@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>DiceBet Roll Verifier</title>
+        <link rel="stylesheet" href="styles.css">
+        <script src="https://unpkg.com/node-forge@0.7.0/dist/forge.min.js"></script>
+        <script src="https://unpkg.com/vue@2.4.2"></script>
+        <script src="https://unpkg.com/vue-router@2.0.0/dist/vue-router.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <h1><a class="title-link" href="https://dice-bet.com/?ref=u:rgbkey">DiceBet</a> Roll Verifier</h1>
+            <div id="input" class="center-box">
+                <h2>Input</h2>
+                <input v-model="serverSeed" type="text" placeholder="Server Secret">
+                <input v-model="serverSeedHash" type="text" placeholder="Server Secret Seed">
+                <input v-model="clientSeed" type="text" placeholder="Client Seed">
+                <input v-model.number="nonce" type="number" placeholder="Bet Nonce">
+            </div>
+            <div id="output" class="center-box">
+                <h2>Output</h2>
+                <pre v-if="serverSeed">{{`Server Seed: ${serverSeed}`}}</pre>
+                <pre v-if="serverSeed">{{`Calculated hash of Server Seed: ${sha512(serverSeed)}`}}</pre>
+                <pre v-if="serverSeedHash">{{`Provided hash of Server Seed: ${serverSeedHash}`}}</pre>
+                <pre v-if="serverSeed && serverSeedHash">{{`Hashes match: ${sha512(serverSeed) === serverSeedHash}`}}</pre>
+                <pre v-if="clientSeed">{{`Client Seed: ${clientSeed}`}}</pre>
+                <pre v-if="clientSeed">{{`Nonce: ${nonce}`}}</pre>
+                <pre v-if="serverSeed && clientSeed">{{`Result of HMAC-SHA512('${nonce}:${serverSeed}:${nonce}', '${nonce}:${clientSeed}:${nonce}')`}}</pre>
+                <pre v-if="serverSeed && clientSeed" v-html="htmlTemplateHash()"></pre>
+                <pre v-if="serverSeed && clientSeed">(Pick the first 5 character set that yields a number 0 <= n <= 999999)</pre>
+                <pre v-if="serverSeed && clientSeed">{{`parseInt(${hashToRoll(hash()).chunk}, 16) = ${hashToRoll(hash()).roll}`}}</pre>
+                <h3 v-if="serverSeed && clientSeed">Roll: {{(hashToRoll(hash()).roll/10000).toFixed(4)}}</h3>
+                <h3 v-if="serverSeedHash">{{sha512(serverSeed) === serverSeedHash ? 'Server seed matches' : 'Server seed does not match'}}</h3>
+            </div>
+        </div>
+        <p class="donation">Donations: <a href="bitcoin:bc1qu98c35yv8j5jzryuk654r2zv8jk2xknuuqa5l7?label=DiceBet%20Verifier%20Donation">bc1qu98c35yv8j5jzryuk654r2zv8jk2xknuuqa5l7</a> &bull; <a href="bitcoin:3M2Gg47EEaGxtRGXHXa2362emEvQYhXt39?label=DiceBet%20Verifier%20Donation">3M2Gg47EEaGxtRGXHXa2362emEvQYhXt39</a> &bull; <a href="https://github.com/RGBKey/bustadice-verifier">GitHub Source</a></p>
+        <p class="attrib">This project uses the third-party libraries <a href="https://vuejs.org/">Vue.js</a> and <a href="https://github.com/digitalbazaar/forge">Forge</a></p>
+        <script src="main.js"></script>
+    </body>
+</html>
